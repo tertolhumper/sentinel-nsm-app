@@ -1,0 +1,7 @@
+FROM jenkins/jenkins:2.580.1-jdk25
+ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
+RUN jenkins-plugin-cli --plugins \
+    kubernetes \
+    workflow-aggregator \
+    git \
+    configuration-as-code

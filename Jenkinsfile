@@ -25,16 +25,22 @@ spec:
         }
     }
     environment {
-        IMAGE = "ghcr.io/tertolhumper/sentinel-nsm-app"
-        TAG = "${BUILD_NUMBER}"
+        IMAGE     = "ghcr.io/tertolhumper/sentinel-nsm-app"
+        JENKINS   = "ghcr.io/tertolhumper/sentinel-nsm-jenkins"
+        TAG       = "${BUILD_NUMBER}"
     }
     stages {
-        stage('Build') {
+        stage('Build App') {
             steps {
                 container('docker') {
-                    sh '''
-                        docker build -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
-                    '''
+                    sh 'docker build -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .'
+                }
+            }
+        }
+        stage('Build Jenkins') {
+            steps {
+                container('docker') {
+                    sh 'docker build -f Dockerfile.jenkins -t ${JENKINS}:latest .'
                 }
             }
         }
@@ -50,6 +56,7 @@ spec:
                             echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USER --password-stdin
                             docker push ${IMAGE}:${TAG}
                             docker push ${IMAGE}:latest
+                            docker push ${JENKINS}:latest
                         '''
                     }
                 }
@@ -58,9 +65,7 @@ spec:
         stage('Update Config') {
             steps {
                 container('kubectl') {
-                    sh '''
-                        kubectl set image deployment/nginx nginx=${IMAGE}:${TAG} -n lemp
-                    '''
+                    sh 'kubectl set image deployment/nginx nginx=${IMAGE}:${TAG} -n lemp'
                 }
             }
         }
