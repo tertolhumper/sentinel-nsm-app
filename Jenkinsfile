@@ -33,7 +33,10 @@ spec:
         stage('Build App') {
             steps {
                 container('docker') {
-                    sh 'docker build -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .'
+                    sh '''
+                        until docker info; do sleep 2; done
+                        docker build -t ${IMAGE}:${TAG} -t ${IMAGE}:latest .
+                    '''
                 }
             }
         }
