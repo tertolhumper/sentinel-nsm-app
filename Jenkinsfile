@@ -68,7 +68,7 @@ spec:
         stage('Update Config') {
             steps {
                 container('kubectl') {
-                    sh 'kubectl set image deployment/nginx nginx=${IMAGE}:${TAG} -n lemp'
+                    sh 'kubectl set image deployment/php-fpm php-fpm=${IMAGE}:${TAG} -n lemp'
                 }
             }
         }
